@@ -1,8 +1,15 @@
 import sys
 
+from raja.actions import handle_command
+
 
 def main():
-    print(f"args: {' ,'.join(sys.argv[1:])}")
+    if len(sys.argv) < 2:
+        print("Too few arguments.")
+        exit(-1)
+    cmd = sys.argv[1]
+    params = sys.argv[2:]
+    handle_command(cmd, params)
 
 
 if __name__ == '__main__':
