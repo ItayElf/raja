@@ -1,11 +1,12 @@
 import difflib
 from typing import List
 
-from raja.actions import init
+from raja.actions import init, add
 
 _commands = {
     "init": init.init,
     "destroy": init.destroy,
+    "add": add.add
 }
 
 
