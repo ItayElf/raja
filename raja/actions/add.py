@@ -1,13 +1,14 @@
 import json
 import os.path
 
-from raja.file_handler.file_handler import load_files, add_file, add_folder, generate_files_string
+from raja.file_handler import load_files, add_file, add_folder, generate_files_string
+from raja.utils import error, success
 
 
 def add(path: str) -> None:
     """Adds a file or a folder to the tracked files list"""
     if not os.path.isdir(".raja"):
-        print("Raja was not initialized. Use 'raja init'")
+        error("Raja was not initialized. Use 'raja init'")
         return
     with open(os.path.join(".raja", ".raja_settings.json")) as f:
         settings = json.load(f)
@@ -19,8 +20,8 @@ def add(path: str) -> None:
         content = add_folder(content, path, settings["ignored_extensions"], settings["ignored_directories"],
                              settings["ignored_files"])
     else:
-        print(f"invalid path: {path}")
+        error(f"invalid path: {path}")
         return
     with open(os.path.join(".raja", ".raja_files"), "w") as f:
         f.write(generate_files_string(content))
-    print(f"{os.path.abspath(path)} was added successfully.")
+    success(f"{os.path.abspath(path)} was added successfully.")
