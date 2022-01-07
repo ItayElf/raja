@@ -128,3 +128,41 @@ def add_folder(content: Folder, path_to_folder: str, ignored_extensions: List[st
     else:
         folder.sub_dirs.append(get_all_files(path_to_folder, ignored_extensions, ignored_directories, ignored_files))
     return content
+
+
+def remove_file(content: Folder, path_to_file: str, ignored_extensions: List[str], ignored_files: List[str]) -> Folder:
+    """Removes a file from a folder object"""
+    if not _is_file_valid(path_to_file, ignored_extensions, ignored_files):
+        return content
+    folder = content
+    while len(path_to_file.split(os.path.sep)) > 1:
+        try:
+            folder = next(filter(lambda x: x.name == path_to_file.split(os.path.sep)[0], folder.sub_dirs))
+        except StopIteration:
+            raise FileNotFoundError(path_to_file)
+        path_to_file = os.path.join(*path_to_file.split(os.path.sep)[1:])
+    folder.files.remove(File(path_to_file))
+    return content
+
+
+def remove_folder(content: Folder, path_to_folder: str, ignored_directories: List[str]) -> Folder:
+    """Removes a subdir from a folder object"""
+    if not _is_dir_valid(path_to_folder, ignored_directories):
+        return content
+    folder = content
+    if path_to_folder == folder.name:
+        return Folder(folder.name, [], [])
+    if path_to_folder.endswith(os.path.sep):
+        path_to_folder = path_to_folder[:-len(os.path.sep)]
+    path = path_to_folder
+    while os.path.sep in path and path.split(os.path.sep)[0] in [d.name for d in folder.sub_dirs]:
+        try:
+            folder = next(filter(lambda x: x.name == path.split(os.path.sep)[0], folder.sub_dirs))
+            path = os.path.join(*path.split(os.path.sep)[1:])
+        except StopIteration:
+            raise FileNotFoundError(path_to_folder)
+    try:
+        folder.sub_dirs.remove(next(filter(lambda x: x.name == path.split(os.path.sep)[0], folder.sub_dirs)))
+    except StopIteration:
+        raise FileNotFoundError(path_to_folder)
+    return content
