@@ -12,7 +12,8 @@ def add(path: str) -> None:
         return
     with open(os.path.join(".raja", ".raja_settings.json")) as f:
         settings = json.load(f)
-    content = load_files(open(os.path.join(".raja", ".raja_files")).read())
+    content = load_files(open(os.path.join(".raja", ".raja_files")).read(), settings["ignored_extensions"],
+                         settings["ignored_directories"], settings["ignored_files"])
     path = os.path.relpath(path, ".")
     if os.path.isfile(path):
         content = add_file(content, path, settings["ignored_extensions"], settings["ignored_files"])
@@ -34,7 +35,8 @@ def remove(path: str) -> None:
         return
     with open(os.path.join(".raja", ".raja_settings.json")) as f:
         settings = json.load(f)
-    content = load_files(open(os.path.join(".raja", ".raja_files")).read())
+    content = load_files(open(os.path.join(".raja", ".raja_files")).read(), settings["ignored_extensions"],
+                         settings["ignored_directories"], settings["ignored_files"])
     path = os.path.relpath(path, ".")
     if os.path.isfile(path):
         content = remove_file(content, path, settings["ignored_extensions"], settings["ignored_files"])

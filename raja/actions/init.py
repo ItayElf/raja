@@ -23,7 +23,7 @@ def init(directory: str = ".") -> None:
     open(os.path.join(raja_path, ".raja_files"), "w+").close()
     with open(os.path.join(raja_path, ".raja_settings.json"), "w+") as f:
         _base_settings["root"] = os.path.abspath(os.path.join(".raja"))
-        json.dump(_base_settings, f, indent=4)
+        json.dump(_base_settings, f, indent=2)
     success(f"Raja directory at {os.path.abspath(raja_path)} was initialized successfully")
 
 

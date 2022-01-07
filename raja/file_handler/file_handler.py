@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pprint import pprint
 from typing import List
 
 
@@ -63,25 +64,30 @@ def generate_files_string(content: Folder, root: str = "") -> str:
     return base.strip()
 
 
-def load_files(content: str) -> Folder:
+def load_files(content: str, ignored_extensions: List[str], ignored_directories: List[str],
+               ignored_files: List[str]) -> Folder:
     """Returns folder object from the content of .raj_files as the root folder"""
     lines = [line for line in content.splitlines() if line]
-    folder = _load_files(lines)
+    folder = _load_files(lines, ignored_extensions, ignored_directories, ignored_files)
     folder.name = "."
     return folder
 
 
-def _load_files(lines: List[str]) -> Folder:
+def _load_files(lines: List[str], ignored_extensions: List[str], ignored_directories: List[str],
+                ignored_files: List[str]) -> Folder:
     """Create Folder object from files file"""
-    local_files = [File(line) for line in lines if os.path.sep not in line]
+    local_files = [File(line) for line in lines if os.path.sep not in line if
+                   _is_file_valid(line, ignored_extensions, ignored_files)]
     nested_files = [line for line in lines if os.path.sep in line]
-    sub_dirs = {line.split(os.path.sep)[0]: [] for line in nested_files}
+    sub_dirs = {line.split(os.path.sep)[0]: [] for line in nested_files if
+                _is_dir_valid(line.split(os.path.sep)[0], ignored_directories)}
     for file in nested_files:
         sub_dir = file.split(os.path.sep)[0]
-        sub_dirs[sub_dir].append(os.path.relpath(file, sub_dir))
+        if _is_dir_valid(sub_dir, ignored_directories):
+            sub_dirs[sub_dir].append(os.path.relpath(file, sub_dir))
     directories = []
     for sub_dir, lines in sub_dirs.items():
-        folder = _load_files(lines)
+        folder = _load_files(lines, ignored_extensions, ignored_directories, ignored_files)
         folder.name = sub_dir
         directories.append(folder)
     return Folder("", local_files, directories)
