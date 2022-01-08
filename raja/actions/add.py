@@ -25,7 +25,7 @@ def add(path: str) -> None:
         return
     with open(os.path.join(".raja", ".raja_files"), "w") as f:
         f.write(generate_files_string(content))
-    success(f"{os.path.abspath(path)} was added successfully.")
+    success(f"{path} was added successfully.")
 
 
 def remove(path: str) -> None:
@@ -47,4 +47,4 @@ def remove(path: str) -> None:
         return
     with open(os.path.join(".raja", ".raja_files"), "w") as f:
         f.write(generate_files_string(content))
-    success(f"{os.path.abspath(path)} was removed successfully.")
+    success(f"{path} was removed successfully.")
