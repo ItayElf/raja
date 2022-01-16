@@ -72,7 +72,7 @@ def _insert_change(conn: sqlite3.Connection, blob: bytes) -> None:
     try:
         conn.execute("INSERT INTO change_blobs(changes) VALUES(?)", (blob,))
         conn.commit()
-    except sqlite3.OperationalError:
+    except sqlite3.IntegrityError:  # blob already exists
         return
 
 
