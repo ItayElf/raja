@@ -39,7 +39,7 @@ class CF:
     def from_encoded(cls, encoded: bytes) -> CF:
         """Returns a CF object from encoded changes byte string"""
         a = cls(b"", b"")
-        a._changes = parse_encoded(encoded)[::-1]
+        a._changes = parse_encoded(encoded)
         return a
 
     @classmethod
