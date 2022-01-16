@@ -22,6 +22,7 @@ class Commit:
     file_changes: List[FileChange]
     timestamp: int  # int(time.time())
     hash: str = field(init=False)
+    idx: int = field(init=False)
 
     def __post_init__(self):
         self.hash = md5((f"{self.author}{self.message}{self.last_commit_hash}{self.timestamp}".encode())).hexdigest()
