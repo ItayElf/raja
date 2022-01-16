@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 
+from raja.committer.orm import init_db
 from raja.utils import error, success
 
 _base_settings = {
@@ -24,6 +25,7 @@ def init(directory: str = ".") -> None:
     with open(os.path.join(raja_path, ".raja_settings.json"), "w+") as f:
         # _base_settings["root"] = os.path.abspath(os.path.join(".raja"))
         json.dump(_base_settings, f, indent=2)
+    init_db(os.path.join(raja_path, ".raja_db"))
     success(f"Raja workspace at {raja_path} was initialized successfully")
 
 
