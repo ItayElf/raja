@@ -33,38 +33,35 @@ FROM change_blobs cb WHERE cb.changes=?
 """
 
 
-def get_file_change(db_path: str, name: str, commit_id: int) -> FileChange:
+def get_file_change(conn: sqlite3.Connection, name: str, commit_id: int) -> FileChange:
     """Returns a file change from its name and commit
     :raise FileNotFoundError"""
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute(_get_file_sql, (name, commit_id))
-        tup = c.fetchone()
-        if not tup:
-            raise FileNotFoundError(f"No file change with name {name} and commit id {commit_id}")
-        return FileChange(name, tup[1], bool(tup[2]))
+    c = conn.cursor()
+    c.execute(_get_file_sql, (name, commit_id))
+    tup = c.fetchone()
+    if not tup:
+        raise FileNotFoundError(f"No file change with name {name} and commit id {commit_id}")
+    return FileChange(name, tup[1], bool(tup[2]))
 
 
-def get_all_changes_commit(db_path: str, commit_id: int) -> List[FileChange]:
+def get_all_changes_commit(conn: sqlite3.Connection, commit_id: int) -> List[FileChange]:
     """Returns all changes for a commit"""
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute(_get_changes_commit_sql, (commit_id,))
-        lst = c.fetchall()
-        if lst:
-            lst = [FileChange(name, changes, bool(is_full)) for name, changes, is_full in lst]
-        return lst
+    c = conn.cursor()
+    c.execute(_get_changes_commit_sql, (commit_id,))
+    lst = c.fetchall()
+    if lst:
+        lst = [FileChange(name, changes, bool(is_full)) for name, changes, is_full in lst]
+    return lst
 
 
-def get_all_changes_name(db_path: str, name: str) -> List[FileChange]:
+def get_all_changes_name(conn: sqlite3.Connection, name: str) -> List[FileChange]:
     """Returns all changes made to a file over time from newest to oldest"""
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute(_get_changes_name_sql, (name,))
-        lst = c.fetchall()
-        if lst:
-            lst = [FileChange(name, changes, bool(is_full)) for name, changes, is_full in lst]
-        return lst
+    c = conn.cursor()
+    c.execute(_get_changes_name_sql, (name,))
+    lst = c.fetchall()
+    if lst:
+        lst = [FileChange(name, changes, bool(is_full)) for name, changes, is_full in lst]
+    return lst
 
 
 def _insert_change(conn: sqlite3.Connection, blob: bytes) -> None:
@@ -76,9 +73,8 @@ def _insert_change(conn: sqlite3.Connection, blob: bytes) -> None:
         return
 
 
-def insert_file_change(db_path: str, fc: FileChange, commit_id: int) -> None:
+def insert_file_change(conn: sqlite3.Connection, fc: FileChange, commit_id: int) -> None:
     """Inserts a file change to the db"""
-    with sqlite3.connect(db_path) as conn:
-        _insert_change(conn, fc.changes)
-        conn.execute(_insert_file_change_sql, (fc.name, int(fc.is_full), commit_id, fc.changes))
-        conn.commit()
+    _insert_change(conn, fc.changes)
+    conn.execute(_insert_file_change_sql, (fc.name, int(fc.is_full), commit_id, fc.changes))
+    conn.commit()
