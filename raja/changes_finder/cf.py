@@ -3,7 +3,8 @@ from __future__ import annotations
 import os.path
 from typing import List
 from raja.changes_finder.changes import Replace, Subtract, Append, Change
-from raja.changes_finder.cf_helpers import get_changes_bin2, get_changes_bin, parse_encoded, combine_encodeds
+from raja.changes_finder.cf_helpers import get_changes_bin2, get_changes_bin, parse_encoded, combine_encodeds, \
+    get_changes_bin_file
 
 _bin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin", "dh_lin.exe")
 
@@ -47,6 +48,13 @@ class CF:
         """Returns a CF object from list of encoded changes byte strings"""
         a = cls(b"", b"")
         a._changes = combine_encodeds(encodeds)
+        return a
+
+    @classmethod
+    def from_file_and_data(cls, fname: str, data: bytes) -> CF:
+        """Returns a CF object from file (which is the current) and data (previous)"""
+        a = cls(b"", b"")
+        a._changes = get_changes_bin_file(_bin_path, fname, data)
         return a
 
     @property

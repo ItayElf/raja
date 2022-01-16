@@ -53,6 +53,14 @@ def get_changes_bin(bin_path: str, previous: bytes, current: bytes) -> List[Chan
     return parse_encoded(ans)
 
 
+def get_changes_bin_file(bin_path: str, fname: str, data: bytes) -> List[Change]:
+    """Returns the changes between the file content and the data"""
+    p = Popen([bin_path, fname], stdin=PIPE, stdout=PIPE)
+    full_input = str(len(data)).encode() + data + b"\n"
+    ans = p.communicate(input=full_input)[0].strip()
+    return parse_encoded(ans)
+
+
 def get_changes_bin2(bin_path: str, previous_fname: str, current_fname: str) -> List[Change]:
     """Returns the changes generated from the given exe using cli args
     :raise FileNotFoundError"""
