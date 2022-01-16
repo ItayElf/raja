@@ -13,9 +13,9 @@ int min_3(int a, int b, int c) {
     return a;
 }
 
-int** lev_array(char* previous, char* current) {
-    int m = strlen(previous) + 1;
-    int n = strlen(current) + 1;
+int** lev_array(char* previous, char* current, size_t previous_size, size_t current_size) {
+    int m = previous_size + 1;
+    int n = current_size + 1;
     int** arr = create_2d_array(n, m);
     for (int i = 1; i < m; i++) {
         arr[0][i] = i;
@@ -36,20 +36,23 @@ int** lev_array(char* previous, char* current) {
 }
 
 void print_changes_reversed(char* previous, char* current) {
-    if (strlen(previous) == 0) {
-        for (int i = strlen(current) - 1; i >= 0; i--) {
+    size_t previous_size = strlen(previous);
+    size_t current_size = strlen(current);
+    printf("%ld\n", current_size);
+    if (previous_size == 0) {
+        for (int i = current_size - 1; i >= 0; i--) {
             printf("A%c%d", current[i], i);
         }
         return;
-    } else if (strlen(current) == 0) {
-        for (int i = strlen(previous) - 1; i >= 0; i--) {
+    } else if (current_size == 0) {
+        for (int i = previous_size - 1; i >= 0; i--) {
             printf("S%c%d", previous[i], 0);
         }
         return;
     }
-    int** arr = lev_array(previous, current);
-    int i = strlen(previous);
-    int j = strlen(current);
+    int** arr = lev_array(previous, current, previous_size, current_size);
+    int i = previous_size;
+    int j = current_size;
     int corner, top, left;
 
     while (i >= 0 && j >= 0 && i + j > 0) {

@@ -33,9 +33,9 @@ def create_commit(files: List[str], conn: sqlite3.Connection, author: str, messa
         cf = CF.from_file_and_data(file, data)
         if cf.no_change:
             continue
-        content = open(file, "rb").read()
-        if len(cf.encoded_changes) < len(content):
+        if len(cf.encoded_changes) < cf.current_len:
             changes.append(FileChange(file, cf.encoded_changes, False))
         else:
+            content = open(file, "rb").read()
             changes.append(FileChange(file, content, True))
     return Commit(author, message, last_hash, changes, int(time.time()))

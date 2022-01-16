@@ -15,6 +15,7 @@ class CF:
 
     def __init__(self, previous: bytes, current: bytes) -> None:
         self._changes = get_changes_bin(_bin_path, previous, current)
+        self.current_len = len(current)
 
     def apply(self, content: bytes, reverse: bool = False) -> bytes:
         """Applies the changes loaded onto the content, giving the new content from the previous or the opposite if reverse is True"""
@@ -33,7 +34,7 @@ class CF:
     def from_files(cls, previous_fname: str, current_fname: str) -> CF:
         """Returns a CF object from changes in the given files"""
         a = cls(b"", b"")
-        a._changes = get_changes_bin2(_bin_path, previous_fname, current_fname)
+        a._changes, a.current_len = get_changes_bin2(_bin_path, previous_fname, current_fname)
         return a
 
     @classmethod
@@ -54,7 +55,7 @@ class CF:
     def from_file_and_data(cls, fname: str, data: bytes) -> CF:
         """Returns a CF object from file (which is the current) and data (previous)"""
         a = cls(b"", b"")
-        a._changes = get_changes_bin_file(_bin_path, fname, data)
+        a._changes, a.current_len = get_changes_bin_file(_bin_path, fname, data)
         return a
 
     @property

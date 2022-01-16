@@ -1,5 +1,5 @@
 output: dh.o ./utils/array.o
-	gcc -g dh.o ./utils/array.o -o dh_lin.exe
+	gcc -g -O2 dh.o ./utils/array.o -o dh_lin.exe
 
 dh.o: dh.c
 	gcc -c dh.c

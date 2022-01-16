@@ -50,18 +50,19 @@ def get_changes_bin(bin_path: str, previous: bytes, current: bytes) -> List[Chan
     ans = p.communicate(input=full_input)[0].strip()
     if os.name == "nt":
         ans = ans.replace(b"\r\n", b"\n")
-    return parse_encoded(ans)
+    return parse_encoded(b"\n".join(ans.split(b"\n")[1:]))
 
 
-def get_changes_bin_file(bin_path: str, fname: str, data: bytes) -> List[Change]:
+def get_changes_bin_file(bin_path: str, fname: str, data: bytes) -> Tuple[List[Change], int]:
     """Returns the changes between the file content and the data"""
     p = Popen([bin_path, fname], stdin=PIPE, stdout=PIPE)
     full_input = str(len(data)).encode() + data + b"\n"
     ans = p.communicate(input=full_input)[0].strip()
-    return parse_encoded(ans)
+    splt = ans.split(b"\n")
+    return parse_encoded(b"\n".join(splt[1:])), int(splt[0])
 
 
-def get_changes_bin2(bin_path: str, previous_fname: str, current_fname: str) -> List[Change]:
+def get_changes_bin2(bin_path: str, previous_fname: str, current_fname: str) -> Tuple[List[Change], int]:
     """Returns the changes generated from the given exe using cli args
     :raise FileNotFoundError"""
     p = Popen([bin_path, previous_fname, current_fname], stdin=PIPE, stdout=PIPE)
@@ -77,7 +78,8 @@ def get_changes_bin2(bin_path: str, previous_fname: str, current_fname: str) -> 
         ans = ans[:-1]
     if b"Couldn't open file" in ans:
         raise FileNotFoundError(f"{previous_fname} or {current_fname}")
-    return parse_encoded(ans)
+    splt = ans.split(b"\n")
+    return parse_encoded(b"\n".join(splt[1:])), int(splt[0])
 
 
 def combine_encodeds(encodeds: List[bytes]) -> List[Change]:
