@@ -125,8 +125,8 @@ void handle_cli(int argc, char** args) {
         free(prev);
         free(curr);
     } else if (argc == 2) {
-        char* prev = read_file(args[1]);
-        char* curr = read_str_with_len();
+        char* prev = read_str_with_len();
+        char* curr = read_file(args[1]);
         print_changes_reversed(prev, curr);
         free(prev);
         free(curr);
