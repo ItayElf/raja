@@ -1,14 +1,15 @@
 import difflib
 from typing import List
 
-from raja.actions import init, add
+from raja.actions import init, add, config
 from raja.utils import error
 
 _commands = {
     "init": init.init,
     "destroy": init.destroy,
     "add": add.add,
-    "remove": add.remove
+    "remove": add.remove,
+    "config": config.config,
 }
 
 
