@@ -66,3 +66,7 @@ class CF:
     def encoded_changes(self) -> bytes:
         """Returns changes in a form of encoded string"""
         return b"".join([val.encoded() for val in self._changes])
+
+    @property
+    def no_change(self) -> bool:
+        return not self._changes
