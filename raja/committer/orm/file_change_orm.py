@@ -1,4 +1,5 @@
 import sqlite3
+import zlib
 from typing import List
 
 from raja.committer import FileChange
@@ -41,7 +42,7 @@ def get_file_change(conn: sqlite3.Connection, name: str, commit_id: int) -> File
     tup = c.fetchone()
     if not tup:
         raise FileNotFoundError(f"No file change with name {name} and commit id {commit_id}")
-    return FileChange(name, tup[1], bool(tup[2]))
+    return FileChange(name, zlib.decompress(tup[1]), bool(tup[2]))
 
 
 def get_all_changes_commit(conn: sqlite3.Connection, commit_id: int) -> List[FileChange]:
@@ -67,7 +68,7 @@ def get_all_changes_name(conn: sqlite3.Connection, name: str) -> List[FileChange
 def _insert_change(conn: sqlite3.Connection, blob: bytes) -> None:
     """Inserts a blob to the changes if not exists"""
     try:
-        conn.execute("INSERT INTO change_blobs(changes) VALUES(?)", (blob,))
+        conn.execute("INSERT INTO change_blobs(changes) VALUES(?)", (zlib.compress(blob),))
         conn.commit()
     except sqlite3.IntegrityError:  # blob already exists
         return
