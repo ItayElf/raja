@@ -23,7 +23,9 @@ void print_2d_array(int** arr, int rows, int cols) {
     }
 }
 
-void destroy_array(int** arr) {
-    free(*arr);
+void destroy_array(int** arr, int rows) {
+    for (int i = 0; i < rows; i++) {
+        free(arr[i]);
+    }
     free(arr);
 }

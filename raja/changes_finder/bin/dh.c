@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "./utils/array.h"
+#include "./utils/inputs.h"
 
 int min_3(int a, int b, int c) {
     if (b < a)
@@ -76,48 +77,7 @@ void print_changes_reversed(char* previous, char* current) {
         }
     }
     printf("\n");
-    destroy_array(arr);
-}
-
-char* read_str_with_len() {
-    int str_len;
-    scanf("%d\n", &str_len);
-    char* str = (char*)(malloc(sizeof(char) * (str_len + 1)));
-    for (int i = 0; i < str_len; i++) {
-        str[i] = 0;
-    }
-    if (str_len != 0) {
-        char temp;
-        int i;
-        for (i = 0; i < str_len; i++) {
-            temp = getchar();
-            str[i] = temp;
-        }
-        str[i] = '\0';
-    }
-    return str;
-}
-
-char* read_file(char* filename) {
-    FILE* f = fopen(filename, "rb");
-    if (!f) {
-        printf("Couldn't open file named %s.\n", filename);
-        return malloc(sizeof(char));
-    }
-    fseek(f, 0, SEEK_END);
-    unsigned long len = (unsigned long)ftell(f);
-    fclose(f);
-    f = fopen(filename, "rb");
-    char* str = malloc(sizeof(char) * len);
-    unsigned long new_len = len;
-    while (new_len > 0 && new_len <= len) {
-        char temp[255];
-        fgets(temp, 255, f);
-        strcat(str, temp);
-        new_len = len - strlen(str);
-    }
-    fclose(f);
-    return str;
+    destroy_array(arr, current_size + 1);
 }
 
 void handle_cli(int argc, char** args) {

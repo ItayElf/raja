@@ -1,11 +1,14 @@
-output: dh.o ./utils/array.o
-	gcc -g -O2 dh.o ./utils/array.o -o dh_lin.exe
+output: dh.o ./utils/array.o ./utils/inputs.o
+	gcc -g -O2 -ggdb3 dh.o ./utils/array.o ./utils/inputs.o -o dh_lin.exe
 
 dh.o: dh.c
-	gcc -c dh.c
+	gcc -c -ggdb3 dh.c
 
-./utils/array.o: utils/array.c ./utils/array.h
-	gcc -c ./utils/array.c -o ./utils/array.o
+./utils/array.o: ./utils/array.c ./utils/array.h
+	gcc -c -ggdb3 ./utils/array.c -o ./utils/array.o
+
+./utils/inputs.o: ./utils/inputs.c ./utils/inputs.h
+	gcc -c -ggdb3 ./utils/inputs.c -o ./utils/inputs.o
 
 clean:
 	rm *.o ./utils/*.o dh_lin.exe

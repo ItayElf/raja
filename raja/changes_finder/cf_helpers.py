@@ -44,8 +44,9 @@ def parse_encoded(encoded: bytes) -> List[Change]:
 def get_changes_bin(bin_path: str, previous: bytes, current: bytes) -> List[Change]:
     """Returns the changes generated from the given exe"""
     p = Popen([bin_path], stdin=PIPE, stdout=PIPE)
-    full_input = str(len(previous)).encode() + b"\n" + previous + b"\n" + str(
-        len(current)).encode() + b"\n" + current + b"\n"
+    i1 = str(len(previous)).encode() + b"\n" + previous + b"\n" if previous else b"0\nA\n"
+    i2 = str(len(current)).encode() + b"\n" + current + b"\n" if current else b"0\nA\n"
+    full_input = i1 + i2
     p.stdin.write(full_input)
     ans = p.communicate(input=full_input)[0].strip()
     if os.name == "nt":
@@ -56,7 +57,9 @@ def get_changes_bin(bin_path: str, previous: bytes, current: bytes) -> List[Chan
 def get_changes_bin_file(bin_path: str, fname: str, data: bytes) -> Tuple[List[Change], int]:
     """Returns the changes between the file content and the data"""
     p = Popen([bin_path, fname], stdin=PIPE, stdout=PIPE)
-    full_input = str(len(data)).encode() + data + b"\n"
+    full_input = str(len(data)).encode() + b"\n" + data + b"\n"
+    if not data:
+        full_input = b"0\nA\n"
     ans = p.communicate(input=full_input)[0].strip()
     splt = ans.split(b"\n")
     return parse_encoded(b"\n".join(splt[1:])), int(splt[0])
