@@ -7,6 +7,7 @@ from raja.utils import error
 _commands = {
     "init": init.init,
     "destroy": init.destroy,
+    "reset": init.reset,
     "add": add.add,
     "remove": add.remove,
     "config": config.config,

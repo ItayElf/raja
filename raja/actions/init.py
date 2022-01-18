@@ -40,3 +40,22 @@ def destroy(directory: str = ".") -> None:
         return
     shutil.rmtree(raja_path)
     success(f"Raja workspace at {directory} was destroyed successfully")
+
+
+def reset(directory: str = ".") -> None:
+    """Reset a raja workspace"""
+    raja_path = os.path.join(directory, ".raja")
+    if not os.path.isdir(raja_path):
+        error(f"Raja workspace does not exists at {directory}")
+        return
+    ans = input("Reset the raja workspace? [y\\N] ")
+    if ans.lower() != "y":
+        return
+    shutil.rmtree(raja_path)
+    os.mkdir(raja_path)
+    open(os.path.join(raja_path, ".raja_files"), "w+").close()
+    with open(os.path.join(raja_path, ".raja_settings.json"), "w+") as f:
+        # _base_settings["root"] = os.path.abspath(os.path.join(".raja"))
+        json.dump(_base_settings, f, indent=2)
+    init_db(os.path.join(raja_path, ".raja_db"))
+    success(f"Raja workspace at {directory} was reset successfully")
