@@ -14,48 +14,51 @@ _base_settings = {
 }
 
 
-def init(directory: str = ".") -> None:
-    """Initialize raja workspace at the given directory"""
-    raja_path = os.path.join(directory, ".raja")
+def init(name: str = "") -> None:
+    """Initialize raja workspace at the current working directory"""
+    raja_path = os.path.join(".", ".raja")
     if os.path.isdir(raja_path):
         error(f"Raja workspace already exists at {raja_path}")
         return
     os.mkdir(raja_path)
     open(os.path.join(raja_path, ".raja_files"), "w+").close()
     with open(os.path.join(raja_path, ".raja_settings.json"), "w+") as f:
-        # _base_settings["root"] = os.path.abspath(os.path.join(".raja"))
+        _base_settings["workspace_name"] = name if name else os.getcwd().split(os.path.sep)[-1]
         json.dump(_base_settings, f, indent=2)
     init_db(os.path.join(raja_path, ".raja_db"))
-    success(f"Raja workspace at {raja_path} was initialized successfully")
+    success(f"Raja workspace at {os.path.relpath(raja_path, '.')} was initialized successfully")
 
 
-def destroy(directory: str = ".") -> None:
+def destroy() -> None:
     """Removes raja workspace from a given directory"""
-    raja_path = os.path.join(directory, ".raja")
+    raja_path = os.path.join(".", ".raja")
     if not os.path.isdir(raja_path):
-        error(f"Raja workspace does not exists at {directory}")
+        error(f"Raja workspace does not exists at the current working directory")
         return
     ans = input("Delete the raja workspace? [y\\N] ")
     if ans.lower() != "y":
         return
     shutil.rmtree(raja_path)
-    success(f"Raja workspace at {directory} was destroyed successfully")
+    success(f"Raja workspace was destroyed successfully")
 
 
-def reset(directory: str = ".") -> None:
+def reset() -> None:
     """Reset a raja workspace"""
-    raja_path = os.path.join(directory, ".raja")
+    raja_path = os.path.join(".", ".raja")
     if not os.path.isdir(raja_path):
-        error(f"Raja workspace does not exists at {directory}")
+        error(f"Raja workspace does not exists at the current working directory")
         return
     ans = input("Reset the raja workspace? [y\\N] ")
     if ans.lower() != "y":
         return
+    with open(os.path.join(raja_path, ".raja_settings.json")) as f:
+        data = json.load(f)
+    name = data["workspace_name"]
     shutil.rmtree(raja_path)
     os.mkdir(raja_path)
     open(os.path.join(raja_path, ".raja_files"), "w+").close()
     with open(os.path.join(raja_path, ".raja_settings.json"), "w+") as f:
-        # _base_settings["root"] = os.path.abspath(os.path.join(".raja"))
+        _base_settings["workspace_name"] = name
         json.dump(_base_settings, f, indent=2)
     init_db(os.path.join(raja_path, ".raja_db"))
-    success(f"Raja workspace at {directory} was reset successfully")
+    success(f"Raja workspace was reset successfully")
