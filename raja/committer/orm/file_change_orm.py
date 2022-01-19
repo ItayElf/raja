@@ -61,21 +61,26 @@ def get_all_changes_name(conn: sqlite3.Connection, name: str) -> List[FileChange
     c.execute(_get_changes_name_sql, (name,))
     lst = c.fetchall()
     if lst:
-        lst = [FileChange(name, changes, bool(is_full)) for name, changes, is_full in lst]
+        lst = [FileChange(name, changes if type(changes) is bytes else changes.encode(), bool(is_full)) for
+               name, changes, is_full in lst]
     return lst
 
 
-def _insert_change(conn: sqlite3.Connection, blob: bytes) -> None:
-    """Inserts a blob to the changes if not exists"""
+def _insert_change(conn: sqlite3.Connection, blob: bytes) -> int:
+    """Inserts a blob to the changes if not exists and returns its id"""
     try:
-        conn.execute("INSERT INTO change_blobs(changes) VALUES(?)", (zlib.compress(blob),))
+        c = conn.execute("INSERT INTO change_blobs(changes) VALUES(?)", (zlib.compress(blob),))
         conn.commit()
+        return c.lastrowid
     except sqlite3.IntegrityError:  # blob already exists
-        return
+        c = conn.cursor()
+        c.execute("SELECT id FROM change_blobs WHERE changes=?", (zlib.compress(blob),))
+        return c.fetchone()[0]
 
 
 def insert_file_change(conn: sqlite3.Connection, fc: FileChange, commit_id: int) -> None:
     """Inserts a file change to the db"""
-    _insert_change(conn, fc.changes)
-    conn.execute(_insert_file_change_sql, (fc.name, int(fc.is_full), commit_id, fc.changes))
+    idx = _insert_change(conn, fc.changes)
+    conn.execute("INSERT INTO file_changes(name, change_id, is_full, commit_id) VALUES(?,?,?,?)",
+                 (fc.name, int(fc.is_full), idx, commit_id))
     conn.commit()

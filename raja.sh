@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker run -it -v $PWD:/opt/src raja "$@"
+docker run -it --rm -v $PWD:/opt/src raja "$@"
