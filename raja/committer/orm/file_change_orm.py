@@ -50,9 +50,12 @@ def get_all_changes_commit(conn: sqlite3.Connection, commit_id: int) -> List[Fil
     c = conn.cursor()
     c.execute(_get_changes_commit_sql, (commit_id,))
     lst = c.fetchall()
-    if lst:
-        lst = [FileChange(name, changes, bool(is_full)) for name, changes, is_full in lst]
-    return lst
+    res = []
+    for (name, change, is_full) in lst:
+        change = zlib.decompress(change)
+        is_full = not not is_full
+        res.append(FileChange(name, change, is_full))
+    return res
 
 
 def get_all_changes_name(conn: sqlite3.Connection, name: str) -> List[FileChange]:
@@ -60,10 +63,12 @@ def get_all_changes_name(conn: sqlite3.Connection, name: str) -> List[FileChange
     c = conn.cursor()
     c.execute(_get_changes_name_sql, (name,))
     lst = c.fetchall()
-    if lst:
-        lst = [FileChange(name, changes if type(changes) is bytes else changes.encode(), bool(is_full)) for
-               name, changes, is_full in lst]
-    return lst
+    res = []
+    for (name, change, is_full) in lst:
+        change = zlib.decompress(change)
+        is_full = not not is_full
+        res.append(FileChange(name, change, is_full))
+    return res
 
 
 def _insert_change(conn: sqlite3.Connection, blob: bytes) -> int:
@@ -82,5 +87,5 @@ def insert_file_change(conn: sqlite3.Connection, fc: FileChange, commit_id: int)
     """Inserts a file change to the db"""
     idx = _insert_change(conn, fc.changes)
     conn.execute("INSERT INTO file_changes(name, change_id, is_full, commit_id) VALUES(?,?,?,?)",
-                 (fc.name, int(fc.is_full), idx, commit_id))
+                 (fc.name, idx, int(fc.is_full), commit_id))
     conn.commit()

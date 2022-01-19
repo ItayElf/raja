@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS file_changes(
     FOREIGN KEY(change_id) REFERENCES change_blobs(id),
     FOREIGN KEY(commit_id) REFERENCES commits(id)
 );
-INSERT INTO change_blobs(changes) VALUES('');
 """
 
 

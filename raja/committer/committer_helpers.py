@@ -6,7 +6,6 @@ from typing import List, Optional
 from raja.changes_finder import CF
 from raja.committer.classes import FileChange, Commit
 from raja.committer.orm.file_change_orm import get_all_changes_name
-from raja.utils import error
 
 
 def get_full_file_content(changes: List[FileChange], current_content: bytes) -> bytes:
