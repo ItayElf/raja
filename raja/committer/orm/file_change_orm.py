@@ -27,6 +27,15 @@ WHERE fc.name=?
 ORDER BY cm."timestamp" DESC;
 """
 
+_get_changes_prior_to = """
+SELECT fc.name, cb.changes, fc.is_full
+FROM file_changes fc
+INNER JOIN change_blobs cb ON cb.id=fc.change_id
+INNER JOIN commits cm ON cm.id=fc.commit_id
+WHERE cm."timestamp" <= ?
+ORDER BY cm."timestamp" DESC;
+"""
+
 _insert_file_change_sql = """
 INSERT INTO file_changes(name, change_id, is_full, commit_id) 
 SELECT ?, cb.id, ?, ? 
@@ -62,6 +71,19 @@ def get_all_changes_name(conn: sqlite3.Connection, name: str) -> List[FileChange
     """Returns all changes made to a file over time from newest to oldest"""
     c = conn.cursor()
     c.execute(_get_changes_name_sql, (name,))
+    lst = c.fetchall()
+    res = []
+    for (name, change, is_full) in lst:
+        change = zlib.decompress(change)
+        is_full = not not is_full
+        res.append(FileChange(name, change, is_full))
+    return res
+
+
+def get_all_changes_prior_to(conn: sqlite3.Connection, timestamp: int) -> List[FileChange]:
+    """Returns all changes prior to the given timestamp (inclusive)"""
+    c = conn.cursor()
+    c.execute(_get_changes_prior_to, (timestamp,))
     lst = c.fetchall()
     res = []
     for (name, change, is_full) in lst:

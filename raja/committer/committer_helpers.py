@@ -1,11 +1,12 @@
 import os.path
 import sqlite3
 import time
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from raja.changes_finder import CF
 from raja.committer.classes import FileChange, Commit
-from raja.committer.orm.file_change_orm import get_all_changes_name
+from raja.committer.orm.commit_orm import get_all_commits, get_commit_by_hash
+from raja.committer.orm.file_change_orm import get_all_changes_name, get_all_changes_prior_to
 
 
 def get_full_file_content(changes: List[FileChange], current_content: bytes) -> bytes:
@@ -38,3 +39,28 @@ def create_commit(files: List[str], conn: sqlite3.Connection, author: str, messa
             content = open(file, "rb").read()
             changes.append(FileChange(file, content, True))
     return Commit(author, message, last_hash, changes, int(time.time()))
+
+
+def save_full_path(path: str, content: bytes) -> None:
+    """saves a path and creates missing dirs"""
+    splt = path.split(os.path.sep)
+    for i in range(1, len(splt)):
+        p = os.path.join(*splt[:i])
+        if not os.path.isdir(p):
+            os.mkdir(p)
+    with open(path, "wb+") as f:
+        f.write(content)
+
+
+def rollback(conn: sqlite3.Connection, commit: str, path: str = ".") -> None:
+    """Goes back to the given commit and deletes the previous ones from db"""
+    c = get_commit_by_hash(conn, commit)
+    changes = get_all_changes_prior_to(conn, c.timestamp)
+    grouped: Dict[str, List[FileChange]] = {}
+    for change in changes:
+        if change.name in grouped:
+            grouped[change.name].append(change)
+        else:
+            grouped[change.name] = [change]
+    for file in grouped:
+        save_full_path(os.path.join(path, file), get_full_file_content(grouped[file], b""))

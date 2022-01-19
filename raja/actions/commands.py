@@ -1,7 +1,7 @@
 import difflib
 from typing import List
 
-from raja.actions import init, add, config, commit
+from raja.actions import init, add, config, commit, rollback
 from raja.utils import error
 
 _commands = {
@@ -12,7 +12,8 @@ _commands = {
     "remove": add.remove,
     "config": config.config,
     "commit": commit.commit,
-}
+    "rollback": rollback.rollback,
+}  # test comment 2
 
 
 def handle_command(cmd: str, params: List[str]) -> None:
@@ -24,7 +25,7 @@ def handle_command(cmd: str, params: List[str]) -> None:
             print(f"Similar commands: \n\t{closest_matches_str}")
         return
     # try:
-    _commands[cmd](*params)
+    _commands[cmd](*params)  # test comment 1
     # except TypeError as e:
     #     print(e)
     #     error(f"Illegal number of arguments to command {cmd}.")
