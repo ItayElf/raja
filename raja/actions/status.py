@@ -8,8 +8,9 @@ from rich.table import Table
 from rich.console import Console
 
 
-def status() -> None:
+def status(*args) -> None:
     """Shows all the saved commits and how many files have been changes in each one"""
+    full = "-a" in args
     if not os.path.isdir(".raja"):
         error("Raja was not initialized. Use 'raja init'")
         return
@@ -25,7 +26,8 @@ def status() -> None:
     t.add_column("Files Changed", justify="right")
     for c in commits:
         date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(c.timestamp))
-        t.add_row(date, c.hash[:6] + "...", c.message, c.author,
+        commit_hash = c.hash if full else c.hash[:6] + "..."
+        t.add_row(date, commit_hash, c.message, c.author,
                   f"{len(c.file_changes)} ({round(len(c.file_changes) * 100 / filecount)}%)")
     console = Console()
     console.print(t)
