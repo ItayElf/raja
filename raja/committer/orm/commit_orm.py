@@ -45,3 +45,9 @@ def get_all_commits(conn: sqlite3.Connection) -> List[Commit]:
         changes = get_all_changes_commit(conn, idx)
         res.append(Commit(author, message, last_hash, changes, timestamp, idx))
     return res
+
+
+def delete_commit_by_hash(conn: sqlite3.Connection, commit: str) -> None:
+    """Removes a commit from the db"""
+    conn.execute("DELETE FROM commits WHERE hash=?", (commit,))
+    conn.commit()

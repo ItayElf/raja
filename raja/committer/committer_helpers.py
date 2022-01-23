@@ -5,8 +5,8 @@ from typing import List, Optional, Dict
 
 from raja.changes_finder import CF
 from raja.committer.classes import FileChange, Commit
-from raja.committer.orm.commit_orm import get_all_commits, get_commit_by_hash
-from raja.committer.orm.file_change_orm import get_all_changes_name, get_all_changes_prior_to
+from raja.committer.orm import get_commit_by_hash, delete_commit_by_hash, get_all_changes_name, \
+    get_all_changes_prior_to, cleanup, get_all_commits
 
 
 def get_full_file_content(changes: List[FileChange], current_content: bytes) -> bytes:
@@ -64,3 +64,7 @@ def rollback(conn: sqlite3.Connection, commit: str, path: str = ".") -> None:
             grouped[change.name] = [change]
     for file in grouped:
         save_full_path(os.path.join(path, file), get_full_file_content(grouped[file], b""))
+    commits = [v for v in get_all_commits(conn) if v.timestamp > c.timestamp]
+    for commit in commits:
+        delete_commit_by_hash(conn, commit.hash)
+    cleanup(conn)

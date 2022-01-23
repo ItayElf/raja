@@ -1,6 +1,7 @@
 import sqlite3
 
 _init_script = """
+PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS change_blobs(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     changes BLOB UNIQUE
@@ -18,8 +19,8 @@ CREATE TABLE IF NOT EXISTS file_changes(
     change_id INTEGER NOT NULL,
     is_full INTEGER NOT NULL,
     commit_id INTEGER NOT NULL,
-    FOREIGN KEY(change_id) REFERENCES change_blobs(id),
-    FOREIGN KEY(commit_id) REFERENCES commits(id)
+    FOREIGN KEY(change_id) REFERENCES change_blobs(id) ON DELETE CASCADE,
+    FOREIGN KEY(commit_id) REFERENCES commits(id) ON DELETE CASCADE
 );
 """
 

@@ -1,6 +1,6 @@
 import sqlite3
 import zlib
-from typing import List
+from typing import List, Tuple
 
 from raja.committer import FileChange
 
@@ -93,6 +93,11 @@ def get_all_changes_prior_to(conn: sqlite3.Connection, timestamp: int) -> List[F
     return res
 
 
+def get_all_file_changes(conn: sqlite3.Connection) -> List[FileChange]:
+    """Returns all file changes"""
+    return get_all_changes_prior_to(conn, 9223372036854775807)
+
+
 def _insert_change(conn: sqlite3.Connection, blob: bytes) -> int:
     """Inserts a blob to the changes if not exists and returns its id"""
     try:
@@ -105,9 +110,45 @@ def _insert_change(conn: sqlite3.Connection, blob: bytes) -> int:
         return c.fetchone()[0]
 
 
+def _get_all_blobs(conn: sqlite3.Connection) -> List[Tuple[int, bytes]]:
+    """Returns a list of all blobs"""
+    c = conn.cursor()
+    c.execute("SELECT id, changes FROM change_blobs")
+    return [(idx, zlib.decompress(blob)) for (idx, blob) in c.fetchall()]
+
+
+def _delete_blob(conn: sqlite3.Connection, idx: int) -> None:
+    """Deletes a blob from the db"""
+    conn.execute("DELETE FROM change_blobs WHERE id=?", (idx,))
+    conn.commit()
+
+
 def insert_file_change(conn: sqlite3.Connection, fc: FileChange, commit_id: int) -> None:
     """Inserts a file change to the db"""
     idx = _insert_change(conn, fc.changes)
     conn.execute("INSERT INTO file_changes(name, change_id, is_full, commit_id) VALUES(?,?,?,?)",
                  (fc.name, idx, int(fc.is_full), commit_id))
     conn.commit()
+
+
+def delete_file_change(conn: sqlite3.Connection, name: str, commit_idx: int) -> None:
+    """Deletes a file change from the db"""
+    conn.execute("DELETE FROM file_changes WHERE name=? AND commit_id=?", (name, commit_idx))
+    conn.commit()
+
+
+def cleanup(conn: sqlite3.Connection) -> None:
+    """Deletes all unused blobs"""
+    from raja.committer.orm import get_all_commits
+    commits_idxs = {c.idx for c in get_all_commits(conn)}
+    c = conn.cursor()
+    c.execute("SELECT commit_id, name FROM file_changes")
+    files = c.fetchall()
+    for f in files:
+        if f[0] not in commits_idxs:
+            delete_file_change(conn, f[1], f[0])
+    changes = {v.changes for v in get_all_file_changes(conn)}
+    blobs = _get_all_blobs(conn)
+    for b in blobs:
+        if b[1] not in changes:
+            _delete_blob(conn, b[0])

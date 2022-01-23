@@ -54,11 +54,13 @@ def reset() -> None:
     with open(os.path.join(raja_path, ".raja_settings.json")) as f:
         data = json.load(f)
     name = data["workspace_name"]
+    username = data["username"]
     shutil.rmtree(raja_path)
     os.mkdir(raja_path)
     open(os.path.join(raja_path, ".raja_files"), "w+").close()
     with open(os.path.join(raja_path, ".raja_settings.json"), "w+") as f:
         _base_settings["workspace_name"] = name
+        _base_settings["username"] = username
         json.dump(_base_settings, f, indent=2)
     init_db(os.path.join(raja_path, ".raja_db"))
     success(f"Raja workspace was reset successfully")
