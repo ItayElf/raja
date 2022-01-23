@@ -17,13 +17,15 @@ def status() -> None:
         filecount = len([v for v in f.read().split("\n") if v])
     with sqlite3.connect(os.path.join(".raja", ".raja_db")) as conn:
         commits = get_all_commits(conn)
-    t = Table(title="Commits (Newest to Latest)")
+    t = Table(title=f"Commits (Newest to Latest, {filecount} Tracked Files)")
     t.add_column("Date", style="cyan")
     t.add_column("Hash", style="magenta")
     t.add_column("Comment", style="green")
+    t.add_column("Author", style="#FF69B4")
     t.add_column("Files Changed", justify="right")
     for c in commits:
         date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(c.timestamp))
-        t.add_row(date, c.hash, c.message, f"{len(c.file_changes)} ({round(len(c.file_changes) * 100 / filecount)}%)")
+        t.add_row(date, c.hash[:6] + "...", c.message, c.author,
+                  f"{len(c.file_changes)} ({round(len(c.file_changes) * 100 / filecount)}%)")
     console = Console()
     console.print(t)

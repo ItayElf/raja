@@ -23,13 +23,16 @@ def insert_commit(conn: sqlite3.Connection, commit: Commit) -> None:
 
 def get_commit_by_hash(conn: sqlite3.Connection, commit_hash: str) -> Commit:
     """Returns a commit by its hash.
-    :raises FileNotFoundError"""
+    :raises FileNotFoundError, ValueError"""
     c = conn.cursor()
-    c.execute("SELECT id, author, message, last_hash, \"timestamp\" FROM commits WHERE hash=?", (commit_hash,))
-    tup = c.fetchone()
-    if not tup:
+    c.execute("SELECT id, author, message, last_hash, \"timestamp\" FROM commits WHERE hash LIKE ? || '%'",
+              (commit_hash,))
+    lst = c.fetchall()
+    if not lst:
         raise FileNotFoundError(f"No commit with hash {commit_hash}")
-    idx, author, message, last_hash, timestamp = tup
+    elif len(lst) != 1:
+        raise ValueError("Given hash is too short. Use full hash.")
+    idx, author, message, last_hash, timestamp = lst[0]
     changes = get_all_changes_commit(conn, idx)
     return Commit(author, message, last_hash, changes, timestamp, idx)
 
