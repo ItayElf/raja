@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os.path
 from typing import List
-from raja.changes_finder.changes import Replace, Subtract, Append, Change
+from raja.changes_finder.changes import Replace, Subtract, Append, Delete, Change
 from raja.changes_finder.cf_helpers import get_changes_bin2, get_changes_bin, parse_encoded, combine_encodeds, \
     get_changes_bin_file
 
@@ -28,6 +28,8 @@ class CF:
                 del lst[change.index]
             elif isinstance(change, Append):
                 lst.insert(change.index, ord(change.value))
+            elif isinstance(change, Delete):
+                raise FileNotFoundError("Delete Change")
         return b"".join([chr(val).encode() for val in lst])
 
     @classmethod

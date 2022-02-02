@@ -9,9 +9,21 @@ from raja.committer.orm import get_commit_by_hash, delete_commit_by_hash, get_al
     get_all_changes_prior_to, cleanup, get_all_commits
 
 
+def _filter_file_changes(changes: List[FileChange]):
+    """Removes all deletes if the file was created again"""
+    if not changes or not changes[-1].is_full and changes[-1].changes == b"D":
+        return changes
+    lst = []
+    for c in changes:
+        if c.is_full or c.changes != b"D":
+            lst.append(c)
+    return lst
+
+
 def get_full_file_content(changes: List[FileChange]) -> bytes:
     """Builds the file content from the given changes. changes must be sorted by chronological order, such that the first one is the newest"""
     file = b""
+    # changes = _filter_file_changes(changes)
     for change in changes[::-1]:
         if change.is_full:
             file = change.changes
@@ -27,6 +39,7 @@ def create_commit(files: List[str], conn: sqlite3.Connection, author: str, messa
     changes = []
     for file in files:
         if not os.path.isfile(file):
+            changes.append(FileChange(file, b"D", False))
             continue
         prev_changes = get_all_changes_name(conn, file)
         data = get_full_file_content(prev_changes)
@@ -63,7 +76,11 @@ def rollback(conn: sqlite3.Connection, commit: str, path: str = ".") -> None:
         else:
             grouped[change.name] = [change]
     for file in grouped:
-        save_full_path(os.path.join(path, file), get_full_file_content(grouped[file]))
+        try:
+            save_full_path(os.path.join(path, file), get_full_file_content(grouped[file]))
+        except FileNotFoundError:
+            if os.path.isfile(file):
+                os.unlink(file)
     commits = [v for v in get_all_commits(conn) if v.timestamp > c.timestamp]
     for commit in commits:
         delete_commit_by_hash(conn, commit.hash)

@@ -1,7 +1,7 @@
 import os
 from typing import List, Tuple
 from subprocess import Popen, PIPE
-from raja.changes_finder.changes import Change, Subtract, Replace, Append
+from raja.changes_finder.changes import Change, Subtract, Replace, Append, Delete
 
 
 def _parse_int(encoded: bytes, start_i: int) -> Tuple[int, int]:
@@ -37,6 +37,8 @@ def parse_encoded(encoded: bytes) -> List[Change]:
             num, to_add = _parse_int(encoded, i)
             i += to_add
             changes.append(cls(val, num))
+        elif encoded[i] == ord(b"D"):
+            changes.append(Delete())
         i += 1
     return changes
 
