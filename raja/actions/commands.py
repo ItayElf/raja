@@ -1,5 +1,6 @@
 import difflib
 from typing import List
+from rich.console import Console
 
 from raja.actions import init, add, config, commit, rollback, status
 from raja.utils import error
@@ -10,8 +11,9 @@ def raja_help():
     tuples = sorted(_commands.items(), key=lambda x: x[0])
     longest = max([len(c) for c, k in tuples])
     print("Commands:")
+    console = Console()
     for c, f in tuples:
-        print(f"\t{c.ljust(longest, ' ')}\t{f.__doc__}")  # TODO: make colorful
+        console.print(f"\t[magenta]{c.ljust(longest, ' ')}[/magenta]\t[green]{f.__doc__}[/green]")
 
 
 _commands = {
