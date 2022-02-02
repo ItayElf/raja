@@ -4,6 +4,16 @@ from typing import List
 from raja.actions import init, add, config, commit, rollback, status
 from raja.utils import error
 
+
+def raja_help():
+    """Shows this message"""
+    tuples = sorted(_commands.items(), key=lambda x: x[0])
+    longest = max([len(c) for c, k in tuples])
+    print("Commands:")
+    for c, f in tuples:
+        print(f"\t{c.ljust(longest, ' ')}\t{f.__doc__}")  # TODO: make colorful
+
+
 _commands = {
     "init": init.init,
     "destroy": init.destroy,
@@ -14,6 +24,7 @@ _commands = {
     "commit": commit.commit,
     "rollback": rollback.rollback,
     "status": status.status,
+    "help": raja_help,
 }
 
 
