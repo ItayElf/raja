@@ -3,6 +3,7 @@ FROM ubuntu:latest
 COPY /raja /opt/src/raja
 COPY requirements.txt /opt/src/requirements.txt
 COPY setup.py /opt/src/setup.py
+COPY constants.py /opt/src/constants.py
 
 WORKDIR /opt/src
 RUN apt-get update

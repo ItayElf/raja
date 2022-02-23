@@ -11,6 +11,8 @@ _base_settings = {
     "ignored_files": [],
     "last_commit": None,
     "username": "",
+    "token": "",
+    "url": "",
 }
 
 
