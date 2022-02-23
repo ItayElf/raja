@@ -19,4 +19,5 @@ def rollback(commit: str, path: str = "."):
         except FileNotFoundError as e:
             error(str(e))
             return
+    conn.close()
     settings["last_commit"] = commit

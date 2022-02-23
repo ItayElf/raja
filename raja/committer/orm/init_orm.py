@@ -30,3 +30,4 @@ def init_db(db_path: str) -> None:
     with sqlite3.connect(db_path) as conn:
         conn.executescript(_init_script)
         conn.commit()
+    conn.close()

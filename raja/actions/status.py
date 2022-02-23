@@ -18,6 +18,7 @@ def status(*args) -> None:
         filecount = len([v for v in f.read().split("\n") if v])
     with sqlite3.connect(os.path.join(".raja", ".raja_db")) as conn:
         commits = get_all_commits(conn)
+    conn.close()
     t = Table(title=f"Commits (Newest to Latest, {filecount} Tracked Files)")
     t.add_column("Date", style="cyan")
     t.add_column("Hash", style="magenta")

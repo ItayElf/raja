@@ -22,6 +22,7 @@ def commit(message: str) -> None:
     with sqlite3.connect(os.path.join(".raja", ".raja_db")) as conn:
         c = create_commit(files, conn, settings["username"], message, settings["last_commit"])
         insert_commit(conn, c)
+    conn.close()
     with open(os.path.join(".raja", ".raja_settings.json"), "w") as f:
         settings["last_commit"] = c.hash
         json.dump(settings, f, indent=2)
