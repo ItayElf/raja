@@ -24,7 +24,7 @@ def login():
     if u:
         username = u
     password = getpass.getpass("Enter password: ")
-    r = requests.get(BASE_URL + "auth/login", params={"username": username, "password": password}, verify=False)
+    r = requests.post(BASE_URL + "auth/login", json={"username": username, "password": password}, verify=False)
     ans = json.loads(r.text)
     if not ans:
         error(f"Incorrect username or password. You can register on {BASE_URL.replace('/api', '') + '/signUp'}")
