@@ -6,7 +6,6 @@ from raja.utils import error, success
 
 _allowed_settings = {
     "username",
-    "url",
 }
 
 
