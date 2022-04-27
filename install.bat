@@ -1,4 +1,4 @@
-python -m venv venv
-.\venv\Scripts\activate
-pip install -r requirements.txt
-python setup.py install
+call python -m venv rajavenv
+call .\rajavenv\Scripts\activate
+call pip install -r requirements.txt
+call python setup.py install

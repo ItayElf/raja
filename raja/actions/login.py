@@ -4,7 +4,7 @@ import getpass
 
 import requests
 
-from constants import BASE_URL
+from raja.constants import BASE_URL
 from raja.utils import error, success
 
 
