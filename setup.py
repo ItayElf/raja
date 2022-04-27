@@ -1,4 +1,5 @@
 from setuptools import setup
+import os
 
 setup(
     name="raja",
@@ -9,5 +10,7 @@ setup(
         'console_script': [
             "raja = raja.__main__:main"
         ]
-    }
+    },
+    package_data={"raja": [os.path.join("changes_finder", "bin", "*.exe")]},
+    include_package_data=True
 )

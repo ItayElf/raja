@@ -14,7 +14,7 @@ def _parse_int(encoded: bytes, start_i: int) -> Tuple[int, int]:
         num += chr(encoded[i + 1]).encode()
         i += 1
     if not num.decode().isdigit():
-        raise ValueError(f"error at i={i}")
+        raise ValueError(f"error at i={i}, num={num}")
     return int(num), i - start_i
 
 
@@ -63,6 +63,8 @@ def get_changes_bin_file(bin_path: str, fname: str, data: bytes) -> Tuple[List[C
     if not data:
         full_input = b"0\nA\n"
     ans = p.communicate(input=full_input)[0].strip()
+    if os.name == "nt":
+        ans = ans.replace(b"\r\n", b"\n")
     splt = ans.split(b"\n")
     return parse_encoded(b"\n".join(splt[1:])), int(splt[0])
 
