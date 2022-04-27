@@ -24,7 +24,8 @@ class Folder:
 def _is_file_valid(filename: str, ignored_extensions: List[str], ignored_files: List[str]) -> bool:
     """Returns true if file is valid"""
     filename = os.path.relpath(filename, "")
-    return os.path.splitext(filename)[1] not in ignored_extensions and filename not in ignored_files
+    return os.path.splitext(filename)[
+               1] not in ignored_extensions and filename not in ignored_files and not not filename
 
 
 def _is_dir_valid(directory: str, ignored_directories: List[str]) -> bool:

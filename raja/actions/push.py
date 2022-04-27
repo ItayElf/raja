@@ -4,7 +4,8 @@ import os
 import requests
 from raja.utils import error, success
 
-BASE_URL = "https://192.168.1.16:5000/api/repos/"
+
+# BASE_URL = "https://192.168.1.16:5000/api/repos/"
 
 
 def push():
@@ -17,11 +18,16 @@ def push():
         settings_path = os.path.join(".raja", ".raja_settings.json")
         with open(settings_path) as f:
             settings = json.load(f)
+        if not settings["base_url"]:
+            error("Use 'raja config base_url <base_url>' before pushing.")
+            return
         new = False
         if not settings["url"]:
             new = True
             repo = input(f"Name for new repo [{settings['workspace_name']}]: ")
-            settings["url"] = BASE_URL + repo
+            if not repo:
+                repo = settings['workspace_name']
+            settings["url"] = settings["base_url"] + "/api/repos/" + repo
             with open(settings_path, "w") as f:
                 json.dump(settings, f)
         url = settings["url"]
@@ -49,7 +55,7 @@ def push():
                         new = True
                 if not new:
                     new_name = input("Try a new name: ")
-                    settings["url"] = BASE_URL + new_name
+                    settings["url"] = settings["base_url"] + "/api/repos/" + new_name
                 with open(settings_path, "w") as f:
                     json.dump(settings, f)
                 push()

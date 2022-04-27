@@ -7,11 +7,12 @@ from raja.utils import error, success
 
 _base_settings = {
     "ignored_extensions": [],
-    "ignored_directories": [],
+    "ignored_directories": [".raja"],
     "ignored_files": [],
     "last_commit": None,
     "username": "",
     "token": "",
+    "base_url": "",
     "url": "",
 }
 
