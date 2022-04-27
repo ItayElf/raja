@@ -1,0 +1,14 @@
+output: dhWin.o ./utils/arrayWin.o ./utils/inputsWin.o
+	gcc -g -O2 -ggdb3 dhWin.o ./utils/arrayWin.o ./utils/inputsWin.o -o dhWin.exe
+
+dhWin.o: dh.c
+	gcc -c -ggdb3 dh.c -o dhWin.o
+
+./utils/arrayWin.o: ./utils/array.c ./utils/array.h
+	gcc -c -ggdb3 ./utils/array.c -o ./utils/arrayWin.o
+
+./utils/inputsWin.o: ./utils/inputs.c ./utils/inputs.h
+	gcc -c -ggdb3 ./utils/inputs.c -o ./utils/inputsWin.o
+
+clean:
+	rm *.o ./utils/*.o dhWin.exe

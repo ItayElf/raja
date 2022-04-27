@@ -1,12 +1,13 @@
 from __future__ import annotations
-
+import platform
 import os.path
 from typing import List
 from raja.changes_finder.changes import Replace, Subtract, Append, Delete, Change
 from raja.changes_finder.cf_helpers import get_changes_bin2, get_changes_bin, parse_encoded, combine_encodeds, \
     get_changes_bin_file
 
-_bin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin", "dh_lin.exe")
+_bin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin",
+                         "dh_lin.exe" if platform.system() == "Linux" else "dhWin.exe")
 
 
 class CF:
