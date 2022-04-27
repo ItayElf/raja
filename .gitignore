@@ -1,5 +1,6 @@
 # Project specifics
 .raja/
+test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
