@@ -2,7 +2,7 @@ import difflib
 from typing import List
 from rich.console import Console
 
-from raja.actions import init, add, config, commit, rollback, status, login, push
+from raja.actions import init, add, config, commit, rollback, status, login, push, pull
 from raja.utils import error
 
 
@@ -29,6 +29,7 @@ _commands = {
     "help": raja_help,
     "login": login.login,
     "push": push.push,
+    "pull": pull.pull,
 }
 
 
