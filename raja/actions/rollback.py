@@ -21,3 +21,5 @@ def rollback(commit: str, path: str = "."):
             return
     conn.close()
     settings["last_commit"] = commit
+    with open(os.path.join(".raja", ".raja_settings.json"), "w") as f:
+        json.dump(settings, f)
