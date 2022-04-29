@@ -7,6 +7,7 @@ from raja.changes_finder import CF
 from raja.committer.classes import FileChange, Commit
 from raja.committer.orm import get_commit_by_hash, delete_commit_by_hash, get_all_changes_name, \
     get_all_changes_prior_to, cleanup, get_all_commits
+from raja.file_handler.file_handler import get_all_files, generate_files_string
 
 
 def _filter_file_changes(changes: List[FileChange]):
@@ -65,11 +66,14 @@ def save_full_path(path: str, content: bytes) -> None:
         f.write(content)
 
 
-def rollback(conn: sqlite3.Connection, commit: str, path: str = ".") -> None:
+def rollback(conn: sqlite3.Connection, commit: str, path: str = ".", ignored_extensions: List[str] = None,
+             ignored_directories: List[str] = None, ignored_files: List[str] = None) -> str:
     """Goes back to the given commit and deletes the previous ones from db"""
     c = get_commit_by_hash(conn, commit)
     changes = get_all_changes_prior_to(conn, c.timestamp)
     grouped: Dict[str, List[FileChange]] = {}
+    files = get_all_files(ignored_extensions=ignored_extensions, ignored_directories=ignored_directories,
+                          ignored_files=ignored_files)
     for change in changes:
         if change.name in grouped:
             grouped[change.name].append(change)
@@ -81,7 +85,11 @@ def rollback(conn: sqlite3.Connection, commit: str, path: str = ".") -> None:
         except FileNotFoundError:
             if os.path.isfile(file):
                 os.unlink(file)
+    for file in generate_files_string(files).split("\n"):
+        if file and file not in grouped:
+            os.unlink(file)
     commits = [v for v in get_all_commits(conn) if v.timestamp > c.timestamp]
     for commit in commits:
         delete_commit_by_hash(conn, commit.hash)
     cleanup(conn)
+    return c.hash

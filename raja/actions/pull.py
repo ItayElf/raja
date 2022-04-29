@@ -55,7 +55,8 @@ def pull():
     with open(os.path.join(raja_path, ".raja_db"), "wb") as f:
         f.write(b"".fromhex(jsn["db"]))
     with sqlite3.connect(os.path.join(raja_path, ".raja_db")) as conn:
-        rb(conn, settings["last_commit"])
+        rb(conn, settings["last_commit"], ignored_extensions=settings["ignored_extensions"],
+           ignored_directories=settings["ignored_directories"], ignored_files=settings["ignored_files"])
     open(os.path.join(raja_path, ".raja_files"), "w").close()
     add(".")
     success("Repo pulled successfully")

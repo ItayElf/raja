@@ -15,7 +15,8 @@ def rollback(commit: str, path: str = "."):
         settings = json.load(f)
     with sqlite3.connect(os.path.join(".raja", ".raja_db")) as conn:
         try:
-            rb(conn, commit, path)
+            commit = rb(conn, commit, path, ignored_extensions=settings["ignored_extensions"],
+                        ignored_directories=settings["ignored_directories"], ignored_files=settings["ignored_files"])
         except FileNotFoundError as e:
             error(str(e))
             return
