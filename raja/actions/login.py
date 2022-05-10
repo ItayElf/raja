@@ -1,10 +1,7 @@
 import json
 import os
 import getpass
-
 import requests
-
-from raja.constants import BASE_URL
 from raja.utils import error, success
 
 
@@ -24,10 +21,11 @@ def login():
     if u:
         username = u
     password = getpass.getpass("Enter password: ")
-    r = requests.post(BASE_URL + "auth/login", json={"username": username, "password": password}, verify=False)
+    base_url = settings["base_url"]
+    r = requests.post(base_url + "api/auth/login", json={"username": username, "password": password}, verify=False)
     ans = json.loads(r.text)
     if not ans:
-        error(f"Incorrect username or password. You can register on {BASE_URL.replace('/api', '') + '/signUp'}")
+        error(f"Incorrect username or password. You can register on {base_url.replace('/api', '') + '/signUp'}")
         return
     settings["token"] = ans
     with open(os.path.join(".raja", ".raja_settings.json"), "w") as f:

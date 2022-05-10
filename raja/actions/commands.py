@@ -41,10 +41,9 @@ def handle_command(cmd: str, params: List[str]) -> None:
         if closest_matches_str:
             print(f"Similar commands: \n\t{closest_matches_str}")
         return
-    # try:
-    _commands[cmd](*params)
-    # except TypeError as e:
-    #     print(e)
-    #     error(f"Illegal number of arguments to command {cmd}.")
-    # except Exception as e:
-    #     print(e)
+    try:
+        _commands[cmd](*params)
+    except TypeError:
+        error(f"Illegal number of arguments to command {cmd}.")
+    except Exception as e:
+        error(str(e))
