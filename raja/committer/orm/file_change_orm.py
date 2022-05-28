@@ -125,6 +125,8 @@ def _delete_blob(conn: sqlite3.Connection, idx: int) -> None:
 
 def insert_file_change(conn: sqlite3.Connection, fc: FileChange, commit_id: int) -> None:
     """Inserts a file change to the db"""
+    if not fc.name:
+        return
     idx = _insert_change(conn, fc.changes)
     conn.execute("INSERT INTO file_changes(name, change_id, is_full, commit_id) VALUES(?,?,?,?)",
                  (fc.name, idx, int(fc.is_full), commit_id))

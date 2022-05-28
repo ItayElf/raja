@@ -23,7 +23,6 @@ def add(path: str) -> None:
     else:
         error(f"invalid path: '{path}'")
         return
-    print(content)
     with open(os.path.join(".raja", ".raja_files"), "w") as f:
         f.write(generate_files_string(content))
     success(f"{path} was added successfully.")

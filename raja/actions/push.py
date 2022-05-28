@@ -44,7 +44,7 @@ def push():
             headers={"Content-Type": "application/json"}
         )
         if r.status_code != 200:
-            error(r.text)
+            # error(r.text)
             if r.status_code == 406:
                 settings["url"] = ""
                 with open(settings_path, "w") as f:
@@ -62,6 +62,6 @@ def push():
                     json.dump(settings, f)
                 push()
         else:
-            success(f"Project pushed to {url} successfully")
+            success(f"Project pushed to {url.replace('/api/repos', 'repo')} successfully")
     except KeyboardInterrupt:
         exit()
